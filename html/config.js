@@ -60,12 +60,10 @@ var videoOpacity = 0.3
 
 
 
+// Example link: https://www.youtube.com/watch?v=abcdefgh
 const youtubeVideo = ""
 const showVideo = false
 
 // if localAudio is true, then loading will load "audio.mp3" file and play it except youtube audio.
 // if localAudio is false, then loading will load youtube audio.
 const localAudio = false // true or false
-
-
-// FOR CUSTOM AUDIO, REPLACE FILE "audio.mp3" WITH YOUR .mp3 FILE.

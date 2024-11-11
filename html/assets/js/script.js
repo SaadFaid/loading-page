@@ -138,32 +138,39 @@ if (youtubeVideo.startsWith("https://www.youtube.com")) {
 	$(".mini-buttons.yt").show().css("display", "flex");
 	if (showVideo) $("body").css("background", "#000");
 }
-if (localAudio){
+if (localAudio) {
 	$('body').append('<audio id="audioPlayer" src="audio.mp3" loop></audio>');
 	$('#audioPlayer')[0].play();
-	a = $('#audioPlayer')
+	a = $('#audioPlayer');
 }
 
 function onYouTubeIframeAPIReady() {
-	yt = new YT.Player('youtube-video', { events: { 'onReady': onPlayerReady } });
+	yt = new YT.Player('youtube-video', { 
+		events: { 'onReady': onPlayerReady }
+	});
 }
 
 function onPlayerReady() {
-	if (localAudio){yt.mute()};
+	if (localAudio) { yt.mute(); }
 }
 
 function toggleMute(self) {
 	$(self).toggleClass("act");
 	isMute = !isMute;
-	isMute ? yt.mute() : yt.unMute();
+	if (localAudio) {
+		yt.mute(); // YouTube video ostaje mutiran ako je localAudio true
+	} else {
+		isMute ? yt.mute() : yt.unMute();
+	}
+	if (a) { a[0].muted = isMute; }
 }
 
 function togglePause(self) {
 	$(self).toggleClass("act");
 	isPaused = !isPaused;
 	isPaused ? yt.pauseVideo() : yt.playVideo();
+	if (a) { isPaused ? a[0].pause() : a[0].play(); }
 }
-
 
 function toggleMuteVideo(self) {
 	$(self).toggleClass("act");
@@ -176,20 +183,13 @@ function togglePauseVideo(self) {
 }
 
 function setVolume(volume) {
-	if (a) {
-		a[0].volume = volume/100;
-	}
-
-	if (v) {
-		v[0].volume = volume/100;
-	}
-
-	if (yt.videoTitle != "") {
+	if (a) { a[0].volume = volume / 100; }
+	if (v) { v[0].volume = volume / 100; }
+	if (yt.videoTitle != "" && !localAudio) {
 		yt.setVolume(volume);
 	}
 
-	$(".inpt span").text(volume+"%")
-
+	$(".inpt span").text(volume + "%");
 	$(".volume-slider").css({
 		background: `rgba(var(--main), ${((volume / 100) + 0.2)})`
 	});
