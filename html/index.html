@@ -15,33 +15,18 @@
 	<link rel="stylesheet" type="text/css" href="assets/css/style.css">
 	<script type="text/javascript" src="assets/js/jquery.min.js"></script>
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+	<script src="http://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+
 	<title>Nevera - Loading Screen</title>
 	<script src="config.js"></script>
 
 </head>
 <body>
-
-	<div class="mini-buttons yt">
+	<div id="particles-js"></div>
+	<div class="winter"></div>
+	<div class="mini-buttons">
 		<button onclick="toggleMute(this)"><i class="bi bi-volume-up"></i></button>
 		<button onclick="togglePause(this)"><i class="bi bi-pause"></i></button>
-		<div class="inpt">
-			<input type="range" min="0" max="100" step="1" value="100" class="volume-slider" oninput="setVolume(this.value)">
-			<span>100%</span>
-		</div>
-	</div>
-
-	<div class="mini-buttons audio">
-		<button onclick="toggleMuteAudio(this)"><i class="bi bi-volume-up"></i></button>
-		<button onclick="togglePauseAudio(this)"><i class="bi bi-pause"></i></button>
-		<div class="inpt">
-			<input type="range" min="0" max="100" step="1" value="100" class="volume-slider" oninput="setVolume(this.value)">
-			<span>100%</span>
-		</div>
-	</div>
-
-	<div class="mini-buttons video">
-		<button onclick="toggleMuteVideo(this)"><i class="bi bi-volume-up"></i></button>
-		<button onclick="togglePauseVideo(this)"><i class="bi bi-pause"></i></button>
 		<div class="inpt">
 			<input type="range" min="0" max="100" step="1" value="100" class="volume-slider" oninput="setVolume(this.value)">
 			<span>100%</span>
@@ -69,6 +54,15 @@
 			<li class="instagram" style="display:none;"><a href="/"><i class="bi bi-instagram"></i></a></li>
 			<li class="youtube" style="display:none;"><a href="/"><i class="bi bi-youtube"></i></a></li>
 			<li class="twitter" style="display:none;"><a href="/"><i class="bi bi-twitter"></i></a></li>
+
+			<li class="tiktok" style="display:none;"><a href="/"><i class="bi bi-tiktok"></i></a></li>
+			<li class="facebook" style="display:none;"><a href="/"><i class="bi bi-facebook"></i></a></li>
+			<li class="twitch" style="display:none;"><a href="/"><i class="bi bi-twitch"></i></a></li>
+			<li class="github" style="display:none;"><a href="/"><i class="bi bi-github"></i></a></li>
+
+
+
+
 		</ul>
 	</div>
 	<div class="loading-bar">

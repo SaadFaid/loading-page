@@ -35,6 +35,10 @@ const showPlayersList = true
 // purple
 const theme = "orange"
 
+// ==== WINTER UPDATE !! ==== \\
+const enableWinterUpdate = false
+// ==== WINTER UPDATE !! ==== \\
+
 
 // Text settings
 const name = "<strong>NEV</strong>ERA"
@@ -43,10 +47,15 @@ const desc = "FiveM Roleplay server featuring an extensive collection of custom 
 
 
 // Social media
-const discord = "https://discord.gg/NeveraDev/tw28AqrgWU"
-const instagram = "" // If = "" then icon will not show up on screen
-const youtube = "https://youtube.com/"
-const twitter = "https://twitter.com/"
+const discord = "https://discord.gg/NeveraDev/tw28AqrgWU"  // If = "" then icon will not show up on screen
+const instagram = ""	// https://example.com
+const youtube = "" 		// https://example.com
+const twitter = "" 		// https://example.com
+const tiktok = ""  		// https://example.com
+const facebook = ""		// https://example.com
+const twitch = "" 		// https://example.com
+const github = "" 		// https://example.com
+
 
 
 // Player List
@@ -59,11 +68,26 @@ const videoBlur = 0
 var videoOpacity = 0.3
 
 
-
 // Example link: https://www.youtube.com/watch?v=abcdefgh
 const youtubeVideo = ""
-const showVideo = false
+const showYoutubeVideo = false
 
+// Local Video
+const enableLocalVideo = false
+
+// Local audio
+const localAudio = false
+
+
+
+// HELP //
+
+//-- YOUTBE
+//-- LOCAL AUDIO
 // if localAudio is true, then loading will load "audio.mp3" file and play it except youtube audio.
 // if localAudio is false, then loading will load youtube audio.
-const localAudio = false // true or false
+
+//-- LOCAL VIDEO
+// if enableLocalVideo is true, then loading will load "video.webm" file and play it except youtube video.
+// If localVideo is enabled, showYoutubeVideo is automatically disabled.
+// You can only import a video from either YouTube or local. Local video taking priority.

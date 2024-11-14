@@ -14,6 +14,7 @@ client_script "client.lua"
 
 files {
     'html/audio.mp3',
+    'html/video.webm',
     'html/index.html',
     'html/config.js',
     'html/assets/js/**',
