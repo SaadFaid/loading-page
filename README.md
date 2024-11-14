@@ -1,6 +1,9 @@
 ## V1.5 +Winter Update (Changelogs)
 - Removed local MP4 files (bugs)
 - Added local MP3 files
+<img src="https://github.com/user-attachments/assets/cbf4fa09-069d-413b-af0f-0cd665029875" width="500">
+
+
 
 ###### (I have no idea why I skipped version 1.4 to be honest)
 
