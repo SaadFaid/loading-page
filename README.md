@@ -1,6 +1,9 @@
 ## V1.5 +Winter Update (Changelogs)
-- Removed local MP4 files (bugs)
-- Added local MP3 files
+- Winter update
+- Added Tiktok, Facebook, Twitch, Github as social media
+- Fixed Local video import (.webm)
+- Fixed Pause/Stop buttons and volume slide.
+
 <img src="https://github.com/user-attachments/assets/cbf4fa09-069d-413b-af0f-0cd665029875" width="500">
 
 
