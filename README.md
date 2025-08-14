@@ -2,6 +2,15 @@
 - Removed players list (didn't work anymore)
 - Added tips panel (on right side)
 
+<img src="https://github.com/user-attachments/assets/c851e5e2-a67b-4fb8-8f4f-19740f4a51a9" width="15%">
+<img src="https://github.com/user-attachments/assets/44f07260-6c91-4176-b1a9-ec1f4968bd77" width="15%">
+<img src="https://github.com/user-attachments/assets/38743955-15c8-4290-8e4a-6a705bf8604a" width="15%">
+<img src="https://github.com/user-attachments/assets/e458cf5f-74bb-451a-b756-58e080976c8c" width="15%">
+<img src="https://github.com/user-attachments/assets/5d691c08-16fd-41ef-a54c-643340418a4b" width="15%">
+
+
+
+
 ## V1.5 +Winter Update (Changelogs)
 - Winter update
 - Added Tiktok, Facebook, Twitch, Github as social media
