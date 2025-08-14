@@ -184,6 +184,133 @@ img.logo {
   transform: translate(0%, -50%);
 }
 
+.panel.panelInfo {
+  width: 18vw;
+}
+
+.panel.panelInfo .list {
+  max-height: 25vw;
+  overflow: auto;
+}
+
+.panelInfo .staff {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.panelInfo .panelItem {
+  display: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.panelInfo .panelItem.active {
+  display: block;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.panelInfo .panelItem .bg {
+  display: grid;
+  gap: 10px;
+  margin-top: 0.5rem;
+  padding: 0.5vw 0.7vw;
+  background-color: #00000050;
+  backdrop-filter: blur(5px);
+  border-radius: 0.55vw;
+  height: 100%;
+}
+
+.panelInfo .panelItem .bg h2 {
+  font-weight: 600;
+  font-size: 1.3vw;
+  margin-bottom: 0.5rem;
+}
+
+.panelInfo .panelItem .bg p {
+  font-size: 0.7vw;
+  font-weight: 300;
+  color: #9f9f9f;
+  line-height: 1.05vw;
+  max-height: 11vw;
+  overflow: auto;
+  padding-right: 0.5rem;
+}
+
+.panelInfo .panelItem .bg p::-webkit-scrollbar {
+  width: 3px;
+}
+
+.panelInfo .panelItem .bg p::-webkit-scrollbar-track {
+  background: #333;
+}
+
+.panelInfo .panelItem .bg p::-webkit-scrollbar-thumb {
+  background: rgba(var(--main), 0.8);
+  box-shadow: 0px 0px 20px rgba(var(--main), 0.8);
+}
+
+.panelInfo .panelItem .bg p::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.panelInfo .panelItem img {
+  aspect-ratio: 16/9;
+  width: 100%;
+  height: auto;
+  display: flex;
+  border-radius: 0.5vw;
+  background-color: rgba(var(--main), 0.12);
+}
+
+.panelInfo .progress-box {
+  background-color: #222;
+  width: 100%;
+}
+
+.panelInfo .progress-bar {
+  height: 0.2vw;
+  background-color: rgba(var(--main), 1);
+  box-shadow: 0px 0px 20px rgba(var(--main), 1);
+  width: 0%;
+  border-radius: 0.5vw;
+  margin-top: 0.3vw;
+  transition: width 0.1s linear;
+}
+
+.panelInfo .dots {
+  display: flex;
+  justify-content: center;
+  gap: 0.8vw;
+  margin-bottom: 0.5vw;
+}
+
+.panelInfo .dot {
+  width: 0.7vw;
+  height: 0.7vw;
+  transform: rotate(45deg);
+  border-radius: 1px;
+  background-color: #111111a6;
+  backdrop-filter: blur(5px);
+  box-shadow: 0 0 0 1px rgba(var(--main), 0.5) inset;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.panelInfo .dot.active,
+.panelInfo .dot.active:hover {
+  background-color: rgba(var(--main), 1);
+  box-shadow: 0 0 20px rgba(var(--main), 1);
+}
+
+.panelInfo .dot:hover {
+  background-color: rgba(var(--main), 0.7);
+}
+
 .pfp {
   width: 1.5vw;
   height: 1.5vw;

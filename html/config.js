@@ -21,10 +21,43 @@ var staff_team = [
 
 ]
 
+const tipsConfig = [
+    {
+        title: "Tip 1 (short)",
+        text: "Always wear your seatbelt when driving in Los Santos.",
+        img: "https://placehold.co/314x176/EEE/31343C",
+        timeout: 10 // seconds
+    },
+    {
+        title: "Tip 2 (long)",
+        text: "Explore different jobs on the server, like taxi driving, delivery missions, or even criminal activities. Each job has its own rewards and risks. Remember to manage your time wisely, avoid unnecessary conflicts, and cooperate with other players to maximize your gains and enjoy the roleplay experience to the fullest. Take advantage of special events and seasonal activities to earn unique rewards. Always keep an eye on the map for dynamic missions and spontaneous opportunities, and make sure your character is properly equipped for any challenge that comes your way. Building relationships with other players can also unlock new roles and adventures, making every session unpredictable and exciting.",
+        img: "https://placehold.co/314x176/EEE/31343C",
+        timeout: 10 // seconds
+    },
+    {
+        title: "Tip 3 (empty-image)",
+        text: "Keep backup gear: weapons, vehicles, and medical kits are essential for surviving unexpected situations.",
+        img: "",
+        timeout: 10 // seconds
+    },
+    {
+        title: "Tip 4 (no image)",
+        text: "Read the server rules carefully and respect roleplay guidelines. Following the rules ensures a better experience for everyone.",
+        timeout: 10 // seconds
+    },
+    {
+        title: "Tip 5 (local-image)",
+        text: "Keep backup gear: weapons, vehicles, and medical kits are essential for surviving unexpected situations.",
+        img: "/tips/tip1.jpg",
+        timeout: 10 // seconds
+    },
+];
+
+
 
 // Staff Settings
 const showStaffTeam = true
-const showPlayersList = true
+const showTipList = true
 
 
 // orange
@@ -55,12 +88,6 @@ const tiktok = ""  		// https://example.com
 const facebook = ""		// https://example.com
 const twitch = "" 		// https://example.com
 const github = "" 		// https://example.com
-
-
-
-// Player List
-const serverCode = "******" //Your server CODE from fivem. (cfx.re/join/abcdef) this ABCDEF is your code, paste it in serverCode. 
-const playerProfileImage = "https://forum.cfx.re/user_avatar/forum.cfx.re/neveradevelopment/144/4447132_2.png"
 
 
 // Video Settings

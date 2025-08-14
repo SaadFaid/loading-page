@@ -46,30 +46,8 @@ if (showStaffTeam){
 	})
 }
 
-if (showPlayersList){
-	$(".panel.playerlist").show()
-	players()
-}
-
-function players(){
-	if (serverCode == "******"){return}
-	$.get("https://servers-frontend.fivem.net/api/servers/single/"+serverCode,function(data){
-		serverInfo = data.Data
-		serverInfo.players.forEach(function(player){
-
-
-			
-			$(".player_list").append(`
-				<div class="staff">
-					<div class="info">
-						<img src="${playerProfileImage}" class="pfp">
-						<p>${player.name}</p>
-					</div>
-					<p class="status">${player.id}</p>
-				</div>
-			`)
-		})
-	})
+if (showTipList){
+	$(".panel.panelInfo").show()
 }
 
 window.addEventListener('message', function(e) {
@@ -208,3 +186,152 @@ function setVolume(volume) {
 		background: `rgba(var(--main), ${(volume / 100) + 0.2})`
 	});
 }
+
+let currentTipIndex = 0;
+let progressStartTime = 0;
+let progressTimeout;
+let paused = false;
+let remaining = 0;
+
+function load_tips(config) {
+    const container = document.getElementById('tipsContainer');
+    const dotsContainer = document.getElementById('dotsContainer');
+    container.innerHTML = '';
+    dotsContainer.innerHTML = '';
+
+    config.forEach((tip, i) => {
+        const panelItem = document.createElement('div');
+        panelItem.classList.add('panelItem');
+        panelItem.style.opacity = 0;
+        var img = ""
+        if (tip.img && tip.img != ""){img = `<img src="${tip.img}">`}
+        if (tip.img == ""){img = `<img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=">`}
+        if (tip.img && tip.img.startsWith("/tips")){
+        	img = `<img src="assets/img${tip.img}">`
+        }
+        panelItem.innerHTML = `
+            ${img}
+            <div class="bg">
+	            <div class="content">
+	                <h2>${tip.title}</h2>
+	                <p>${tip.text}</p>
+	            </div>
+        	</div>
+        `;
+        container.appendChild(panelItem);
+
+        const dot = document.createElement('span');
+        dot.classList.add('dot');
+        dot.addEventListener('click', () => showTip(i));
+        panelItem.addEventListener('mouseenter', pauseProgress);
+        panelItem.addEventListener('mouseleave', resumeProgress);
+        dotsContainer.appendChild(dot);
+    });
+
+    showTip(0);
+}
+
+function showTip(index) {
+    const items = document.querySelectorAll('.panelItem');
+    const dots = document.querySelectorAll('.dot');
+
+    items.forEach((item, i) => {
+        if (i === index) {
+            fadeIn(item, 100);
+            item.classList.add('active');
+        } else {
+            fadeOut(item, 100);
+            item.classList.remove('active');
+        }
+    });
+
+    dots.forEach((dot, i) => dot.classList.toggle('active', i === index));
+
+    currentTipIndex = index;
+    remaining = tipsConfig[index].timeout * 1000;
+    startProgress();
+}
+
+function fadeIn(element, duration) {
+    element.style.display = '';
+    element.style.opacity = 0;
+    let last = +new Date();
+    const tick = function() {
+        element.style.opacity = +element.style.opacity + (new Date() - last) / duration;
+        last = +new Date();
+
+        if (+element.style.opacity < 1) {
+            requestAnimationFrame(tick);
+        } else {
+            element.style.opacity = 1;
+        }
+    };
+    tick();
+}
+
+function fadeOut(element, duration) {
+    element.style.opacity = 1;
+    let last = +new Date();
+    const tick = function() {
+        element.style.opacity = +element.style.opacity - (new Date() - last) / duration;
+        last = +new Date();
+
+        if (+element.style.opacity > 0) {
+            requestAnimationFrame(tick);
+        } else {
+            element.style.opacity = 0;
+            element.style.display = 'none';
+        }
+    };
+    tick();
+}
+
+function startProgress() {
+    const bar = document.getElementById('progressBar');
+    const tip = tipsConfig[currentTipIndex];
+    const total = remaining;
+
+    clearTimeout(progressTimeout);
+    bar.style.transition = 'none';
+    bar.style.width = `${ ((tip.timeout*1000 - remaining)/(tip.timeout*1000)) * 100 }%`;
+
+    progressStartTime = Date.now();
+
+    setTimeout(() => {
+        if (!paused) {
+            bar.style.transition = `width ${total/1000}s linear`;
+            bar.style.width = '100%';
+        }
+    }, 20);
+
+    progressTimeout = setTimeout(nextTip, total);
+}
+
+function nextTip() {
+    remaining = 0;
+    showTip((currentTipIndex + 1) % tipsConfig.length);
+}
+
+function pauseProgress() {
+    if (paused) return;
+    paused = true;
+
+    const bar = document.getElementById('progressBar');
+    const tip = tipsConfig[currentTipIndex];
+    const elapsed = Date.now() - progressStartTime;
+    remaining = Math.max(remaining - elapsed, 0);
+
+    const computedWidth = ((tip.timeout*1000 - remaining) / (tip.timeout*1000)) * 100;
+    bar.style.transition = 'none';
+    bar.style.width = `${computedWidth}%`;
+
+    clearTimeout(progressTimeout);
+}
+
+function resumeProgress() {
+    if (!paused) return;
+    paused = false;
+    startProgress();
+}
+
+load_tips(tipsConfig);

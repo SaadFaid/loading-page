@@ -1,3 +1,7 @@
+## V1.6 (Changelogs)
+- Removed players list (didn't work anymore)
+- Added tips panel (on right side)
+
 ## V1.5 +Winter Update (Changelogs)
 - Winter update
 - Added Tiktok, Facebook, Twitch, Github as social media
