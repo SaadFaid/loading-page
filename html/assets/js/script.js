@@ -1,337 +1,288 @@
-/*=================================================================*\
-/* By: 			|	Nevera Development  							|
-/* FiveM: 		|	https://forum.cfx.re/u/neveradevelopment		|
-/* Discord: 	|	https://discord.gg/NeveraDev/tw28AqrgWU  		|
-/*=================================================================*/
-/* If you have any problems you can contact us via discord. <3     */
+/* full script.js - robust image handling + smooth progress + tips fade */
 
-
+/* --- Branding text --- */
 $(".center h1").html(name)
 $(".center p").html(underName)
 $(".center span").html(desc)
-var serverInfo = null
+
+/* --- Loading bar helper --- */
 function loading(num){
-	let current = parseInt($(".loading-bar p").text(), 10) || 0;
-	const step = 1;
-	const delay = 700 / Math.abs(num - current);
-
-	const interval = setInterval(function(){
-		if (current < num) {
-			current += step;
-			if (current > num) current = num;
-		} else if (current > num) {
-			current -= step;
-			if (current < num) current = num;
-		} else {
-			clearInterval(interval);
-		}
-		$(".loading-bar p").text(current + "%");
-	}, delay);
-	
-	$(".loading-bar .line").width(num + "%");
+	$("#loadingText").text(num + "%");
+	$(".loading-bar .line").css("width", num + "%");
 }
 
-if (showStaffTeam){
-	$(".panel.staffteam").show()
-	staff_team.forEach(function(user){
-		$(".staff_team").append(`
-			<div class="staff">
-				<div class="info">
-					<img src="${user.image}" class="pfp">
-					<p>${user.name}</p>
-				</div>
-				<p class="status">${user.rank}</p>
-			</div>
-		`)
-	})
-}
-
-if (showTipList){
-	$(".panel.panelInfo").show()
-}
-
+/* --- Smooth GTA/FiveM progress --- */
+let gtaProgress = 0;
+let gtaInterval;
 window.addEventListener('message', function(e) {
-    if(e.data.eventName === 'loadProgress') {
-    	var num = (e.data.loadFraction * 100).toFixed(0)
-        loading(num);
+    if (e.data && e.data.eventName === 'loadProgress') {
+    	let target = Math.floor(e.data.loadFraction * 100);
+    	clearInterval(gtaInterval);
+    	gtaInterval = setInterval(()=>{
+    		if (gtaProgress < target){
+    			gtaProgress++;
+    			loading(gtaProgress);
+    		} else {
+    			clearInterval(gtaInterval);
+    		}
+    	}, 12); // smaller = smoother
     }
 });
 
-const socials = { discord, instagram, youtube, twitter, tiktok, facebook, twitch, github };
-const platforms = ["discord", "instagram", "youtube", "twitter", "tiktok", "facebook", "twitch", "github"];
+/* --- Local preview auto progress (jump style, 0->100 in 45s) --- */
+if (window.location.protocol === "file:" || window.location.hostname === "localhost") {
+	let jumpProgress = 0;
+	const totalDuration = 45000; // 45s
+	const steps = 10;            // number of jumps (10% per step)
+	const stepTime = totalDuration / steps;
 
-platforms.forEach(platform => {
-	if (socials[platform] != "") {
-		$(`.${platform}`).show();
-		$(`.${platform} a`).attr("href", socials[platform]);
-	}
+	let jumpInterval = setInterval(()=>{
+		if (jumpProgress < 100) {
+			jumpProgress += 100 / steps;
+			loading(Math.floor(jumpProgress));
+		} else {
+			clearInterval(jumpInterval);
+		}
+	}, stepTime);
+}
+
+/* --- Resolve image path robustly --- */
+function resolveImagePath(p) {
+    if (!p) return 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
+    if (/^https?:\/\//i.test(p)) return p;
+    if (/^(?:\.\/)?assets\//i.test(p)) return p.replace(/^\.\//,'');
+    if (/^\//.test(p)) return p.replace(/^\//,'');
+    return `assets/img/tips/${p}`;
+}
+
+/* --- Preload tips images, replace any broken ones with fallback --- */
+function preloadTipsImages(tips, cb){
+    if (!Array.isArray(tips) || tips.length === 0) { cb(); return; }
+    let loaded = 0;
+    const total = tips.length;
+    const fallback = 'assets/img/tips/placeholder.jpg';
+
+    tips.forEach((tip, i) => {
+        if (!tip.img) {
+            tips[i].img = fallback;
+            loaded++; if (loaded === total) cb();
+            return;
+        }
+        const src = resolveImagePath(tip.img);
+        const img = new Image();
+        img.onload = () => { loaded++; if (loaded === total) cb(); };
+        img.onerror = () => {
+            console.warn(`Tip image failed to load: ${src} — using fallback`);
+            tips[i].img = fallback;
+            loaded++; if (loaded === total) cb();
+        };
+        img.src = src;
+    });
+}
+
+/* --- Show tips with fade + dots + progress --- */
+function initTipsPanel(){
+    if (!showTipList || !Array.isArray(tipsConfig) || tipsConfig.length === 0) return;
+
+    $(".panel.panelInfo").show();
+    let currentTip = 0;
+    let runningTimeout = null;
+    let progressInterval = null;
+
+    function showTip(index){
+        clearTimeout(runningTimeout);
+        clearInterval(progressInterval);
+
+        const tip = tipsConfig[index];
+        const imgSrc = resolveImagePath(tip.img);
+
+        $("#tipsContainer").fadeOut(300, function(){
+            $(this).html(`
+                <div class="panelItem active">
+                    ${tip.img ? `<img src="${imgSrc}" class="tip-img" onerror="this.onerror=null;this.src='assets/img/tips/placeholder.jpg'">` : `<img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" class="tip-img">`}
+                    <div class="bg">
+                        <div class="content">
+                            <h2>${tip.title}</h2>
+                            <p>${tip.text}</p>
+                        </div>
+                    </div>
+                </div>
+            `).fadeIn(350);
+        });
+
+        $("#dotsContainer").empty();
+        tipsConfig.forEach((_,i) => {
+            $("#dotsContainer").append(`<span class="dot ${i===index?'active':''}" data-idx="${i}"></span>`);
+        });
+
+        $("#dotsContainer .dot").off('click').on('click', function(){
+            const idx = parseInt($(this).attr('data-idx'), 10);
+            currentTip = idx;
+            showTip(currentTip);
+        });
+
+        $("#progressBar").css({ width: '0%' });
+        let progress = 0;
+        const step = 100 / (tip.timeout * 10);
+        progressInterval = setInterval(() => {
+            progress += step;
+            $("#progressBar").css('width', Math.min(progress,100) + '%');
+            if (progress >= 100) {
+                clearInterval(progressInterval);
+                currentTip = (currentTip + 1) % tipsConfig.length;
+                showTip(currentTip);
+            }
+        }, 100);
+    }
+
+    showTip(currentTip);
+}
+
+/* --- Kick off preloading then init tips --- */
+preloadTipsImages(tipsConfig, function(){
+    console.log("All tip images preloaded (or replaced with fallback).");
+    initTipsPanel();
+});
+/* --- Random forward-only loading bar, finishes in 60s --- */
+let current = 0;       // current %
+let target = 0;        // target %
+const totalTime = 60000; // total time in ms
+const startTime = Date.now();
+
+function pickNextTarget() {
+    const now = Date.now();
+    const timeElapsed = now - startTime;
+    const timeLeft = totalTime - timeElapsed;
+
+    if (current >= 100 || timeLeft <= 0) {
+        current = 100;
+        loading(100);
+        return;
+    }
+
+    // Random jump size: 5–15%, but don't overshoot
+    let maxJump = Math.min(15, 100 - current);
+    let jump = Math.floor(Math.random() * maxJump) + 5;
+    target = current + jump;
+
+    // Random step duration: 0.3–2s
+    let stepDuration = (Math.random() * 1700) + 300;
+
+    // Adjust duration so we finish at 100% in time
+    const jumpsLeft = Math.ceil((100 - current) / 5);
+    const maxStepDuration = Math.max(200, timeLeft / jumpsLeft);
+    stepDuration = Math.min(stepDuration, maxStepDuration);
+
+    animateStep(current, target, stepDuration);
+}
+
+function animateStep(from, to, stepDuration) {
+    const stepStart = Date.now();
+
+    function frame() {
+        const now = Date.now();
+        let progress = Math.min(1, (now - stepStart) / stepDuration);
+
+        // ease-in-out curve
+        let eased = progress < 0.5
+            ? 2 * progress * progress
+            : -1 + (4 - 2 * progress) * progress;
+
+        current = from + (to - from) * eased;
+        loading(Math.floor(current));
+
+        if (progress < 1) {
+            requestAnimationFrame(frame);
+        } else {
+            if (current < 100) {
+                // random pause 200–800ms between jumps
+                setTimeout(pickNextTarget, Math.random() * 600 + 200);
+            } else {
+                current = 100;
+                loading(100);
+            }
+        }
+    }
+
+    frame();
+}
+
+// Start loading
+pickNextTarget();
+/* --- Socials logic --- */
+const socials = { discord, instagram, youtube, twitter, tiktok, facebook, twitch, github };
+Object.keys(socials).forEach(key => {
+    const link = socials[key];
+    if (link && link.trim() !== "") {
+        $(`.${key}`).show();
+        $(`.${key} a`).attr("href", link).attr("target","_blank").attr("rel","noopener noreferrer");
+    }
 });
 
-$("a").on("click",function(e){
-	e.preventDefault()
-	window.invokeNative('openUrl', e.target.href)
-})
+/* --- Theme background --- */
+function setTheme(bg) {
+	$("body").append(`<style>:root{--main:${bg.color};}</style>`);
+	$("body").css("background-image", `url('assets/img/${bg.file}')`);
+}
+const themes = {
+	orange: {color:"255,150,0", file:"orange.jpg"},
+	red:    {color:"255,0,0", file:"red.jpg"},
+	blue:   {color:"0,163,255", file:"blue.jpg"},
+	green:  {color:"65,255,0", file:"green.jpg"},
+	pink:   {color:"255,122,237", file:"pink.jpg"},
+	purple: {color:"193,67,255", file:"purple.jpg"},
+	winter: {color:"255,255,255", file:"winter.jpg"},
+};
+if (themes[theme]) setTheme(themes[theme]);
 
-if (theme == "orange"){
-	$("body").append(`<style>:root{--main:255, 150, 0;}</style>`)
-	$("body").css("background-image","url('assets/img/orange.jpg')")
-	$(".winter").css("background","linear-gradient(0deg, rgb(255 150 0 / 10%) 0%, rgba(255, 150, 0, 0.0) 100%)")
-}
-if (theme == "red"){
-	$("body").append(`<style>:root{--main:255,0,0;}</style>`)
-	$("body").css("background-image","url('assets/img/red.jpg')")
-	$(".winter").css("background","linear-gradient(0deg, rgb(255 0 0 / 10%) 0%, rgba(255, 0, 0, 0.0) 100%)")
-}
-if (theme == "blue"){
-	$("body").append(`<style>:root{--main:0, 163, 255;}</style>`)
-	$("body").css("background-image","url('assets/img/blue.jpg')")
-	$(".winter").css("background","linear-gradient(0deg, rgb(0 163 255 / 10%) 0%, rgba(0, 163, 255, 0.0) 100%)")
-}
-if (theme == "green"){
-	$("body").append(`<style>:root{--main:65, 255, 0;}</style>`)
-	$("body").css("background-image","url('assets/img/green.jpg')")
-	$(".winter").css("background","linear-gradient(0deg, rgb(65 255 0 / 10%) 0%, rgba(65, 255, 0, 0.0) 100%)")
-}
-if (theme == "pink"){
-	$("body").append(`<style>:root{--main:255, 122, 237;}</style>`)
-	$("body").css("background-image","url('assets/img/pink.jpg')")
-	$(".winter").css("background","linear-gradient(0deg, rgb(255 122 237 / 10%) 0%, rgba(255, 122, 237, 0.0) 100%)")
-}
-if (theme == "purple"){
-	$("body").append(`<style>:root{--main:193, 67, 255;}</style>`)
-	$("body").css("background-image","url('assets/img/purple.jpg')")
-	$(".winter").css("background","linear-gradient(0deg, rgb(193 67 255 / 10%) 0%, rgba(193, 67, 255, 0.0) 100%)")
-}
-// Winter update
-if (enableWinterUpdate){
-	particlesJS("particles-js", { "particles": { "number": { "value": 160, "density": { "enable": true, "value_area": 800 } }, "color": { "value": "#ffffff" }, "shape": { "type": "circle", "stroke": { "width": 0, "color": "#000000" }, "polygon": { "nb_sides": 5 }, "image": { "src": "img/github.svg", "width": 100, "height": 100 } }, "opacity": { "value": 0.5, "random": false, "anim": { "enable": false, "speed": 1, "opacity_min": 0.1, "sync": false } }, "size": { "value": 3, "random": true, "anim": { "enable": false, "speed": 40, "size_min": 0.1, "sync": false } }, "line_linked": { "enable": false, "distance": 150, "color": "#ffffff", "opacity": 0.4, "width": 1 }, "move": { "enable": true, "speed": 1.5, "direction": "bottom", "random": true, "straight": false, "out_mode": "out", "bounce": false, "attract": { "enable": true, "rotateX": 100, "rotateY": 1200 } } }, "interactivity": { "detect_on": "canvas", "events": { "onhover": { "enable": false, "mode": "repulse" }, "onclick": { "enable": false, "mode": "repulse" }, "resize": true }, "modes": { "grab": { "distance": 400, "line_linked": { "opacity": 1 } }, "bubble": { "distance": 400, "size": 40, "duration": 2, "opacity": 8, "speed": 3 }, "repulse": { "distance": 223.7762237762238, "duration": 0.4 }, "push": { "particles_nb": 4 }, "remove": { "particles_nb": 2 } } }, "retina_detect": true });
-	$("body").css("background-image","url('assets/img/winter.jpg')")
-	$(".winter").css("display","flex")
-	$("#particles-js").css("opacity",1)
+/* --- Staff team --- */
+if (showStaffTeam && Array.isArray(staff_team) && staff_team.length){
+    $(".panel.staffteam").show();
+    staff_team.forEach(u => {
+        $(".staff_team").append(`
+            <div class="staff">
+                <div class="info">
+                    <img src="${u.image || 'assets/img/staff/default.jpg'}" class="pfp" onerror="this.onerror=null;this.src='assets/img/staff/default.jpg'">
+                    <p>${u.name}</p>
+                </div>
+                <p class="status">${u.rank}</p>
+            </div>
+        `);
+    });
 }
 
-let a, vl, yt, isMute = false, isPaused = false;
-
-if (youtubeVideo.startsWith("https://www.youtube.com")) {
-	if (!enableLocalVideo){
-		let videoId = youtubeVideo.split('/').pop().split('=')[1];
-		if (!showYoutubeVideo){
-			videoOpacity = 0
-
-		}
-		$("iframe").attr("src", `https://www.youtube.com/embed/${videoId}?autoplay=1&controls=0&enablejsapi=1&disablekb=1`)
-				   .css({ filter: `blur(${videoBlur}px)`, opacity: videoOpacity });
-		if (showYoutubeVideo) $("body").css("background", "#000");
-		if (enableLocalVideo){
-			$("iframe").attr("src","")
-		}
-	}
-}
+/* --- Audio / video & controls --- */
+let a, vl, isMute=false, isPaused=false;
 if (localAudio) {
-	$('body').append('<audio id="audioPlayer" src="audio.mp3" loop></audio>');
-	$('#audioPlayer')[0].play();
-	a = $('#audioPlayer');
+    $('body').append('<audio id="audioPlayer" src="audio.mp3" loop autoplay></audio>');
+    a = $('#audioPlayer');
+    a[0].volume = 1;
+    a[0].play().catch(()=>{ console.log("Autoplay blocked by browser; user interaction required."); });
 }
-
 if (enableLocalVideo) {
-	$('body').append('<video id="videoPlayer" autoplay loop><source src="video.webm" type="video/webm"></video>');
-	$('#videoPlayer')[0].play();
-	vl = $('#videoPlayer');
-	if (localAudio){
-		vl[0].muted = true
-	}
-	$("body").css("background", "#000");
+    $('body').append('<video id="videoPlayer" autoplay loop><source src="video.webm" type="video/webm"></video>');
+    vl = $('#videoPlayer');
+    vl[0].play().catch(()=>{});
 }
 
-function onYouTubeIframeAPIReady() {
-	yt = new YT.Player('youtube-video', { 
-		events: { 'onReady': onPlayerReady }
-	});
+function toggleMute(btn) {
+    isMute = !isMute;
+    if (a && a[0]) a[0].muted = isMute;
+    if (vl && vl[0]) vl[0].muted = isMute;
+    $(btn).html(isMute ? '<i class="bi bi-volume-mute"></i>' : '<i class="bi bi-volume-up"></i>');
+}
+function togglePause(btn) {
+    isPaused = !isPaused;
+    if (a && a[0]) isPaused ? a[0].pause() : a[0].play();
+    if (vl && vl[0]) isPaused ? vl[0].pause() : vl[0].play();
+    $(btn).html(isPaused ? '<i class="bi bi-play"></i>' : '<i class="bi bi-pause"></i>');
+}
+function setVolume(val) {
+    const vol = Math.max(0, Math.min(100, Number(val)));
+    if (a && a[0]) a[0].volume = vol / 100;
+    if (vl && vl[0]) vl[0].volume = vol / 100;
+    $("#volumeVal").text(vol + "%");
 }
 
-function onPlayerReady() {
-	if (localAudio) { yt.mute(); }
-}
-
-function toggleMute(self) {
-	$(self).toggleClass("act");
-	isMute = !isMute;
-	if (yt && typeof yt.mute === "function") {
-		localAudio ? yt.mute() : (isMute ? yt.mute() : yt.unMute());
-	}
-	if (a && a[0]) { a[0].muted = isMute; }
-	if (vl && vl[0]) { if (localAudio){vl[0].muted = true}; vl[0].muted = localAudio || isMute; }
-}
-
-function togglePause(self) {
-	$(self).toggleClass("act");
-	isPaused = !isPaused;
-	if (yt && typeof yt.pauseVideo === "function" && typeof yt.playVideo === "function") {
-		isPaused ? yt.pauseVideo() : yt.playVideo();
-	}
-	if (a && a[0]) { isPaused ? a[0].pause() : a[0].play(); }
-	if (vl && vl[0]) { isPaused ? vl[0].pause() : vl[0].play()}
-}
-
-
-function setVolume(volume) {
-	if (a && a[0]) { a[0].volume = volume / 100; }
-	if (vl && vl[0]) { vl[0].volume = volume / 100; }
-	if (yt && typeof yt.setVolume === "function" && yt.videoTitle !== "" && !localAudio) {
-		yt.setVolume(volume);
-	}
-
-	$(".inpt span").text(volume + "%");
-	$(".volume-slider").css({
-		background: `rgba(var(--main), ${(volume / 100) + 0.2})`
-	});
-}
-
-let currentTipIndex = 0;
-let progressStartTime = 0;
-let progressTimeout;
-let paused = false;
-let remaining = 0;
-
-function load_tips(config) {
-    const container = document.getElementById('tipsContainer');
-    const dotsContainer = document.getElementById('dotsContainer');
-    container.innerHTML = '';
-    dotsContainer.innerHTML = '';
-
-    config.forEach((tip, i) => {
-        const panelItem = document.createElement('div');
-        panelItem.classList.add('panelItem');
-        panelItem.style.opacity = 0;
-        var img = ""
-        if (tip.img && tip.img != ""){img = `<img src="${tip.img}">`}
-        if (tip.img == ""){img = `<img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=">`}
-        if (tip.img && tip.img.startsWith("/tips")){
-        	img = `<img src="assets/img${tip.img}">`
-        }
-        panelItem.innerHTML = `
-            ${img}
-            <div class="bg">
-	            <div class="content">
-	                <h2>${tip.title}</h2>
-	                <p>${tip.text}</p>
-	            </div>
-        	</div>
-        `;
-        container.appendChild(panelItem);
-
-        const dot = document.createElement('span');
-        dot.classList.add('dot');
-        dot.addEventListener('click', () => showTip(i));
-        panelItem.addEventListener('mouseenter', pauseProgress);
-        panelItem.addEventListener('mouseleave', resumeProgress);
-        dotsContainer.appendChild(dot);
-    });
-
-    showTip(0);
-}
-
-function showTip(index) {
-    const items = document.querySelectorAll('.panelItem');
-    const dots = document.querySelectorAll('.dot');
-
-    items.forEach((item, i) => {
-        if (i === index) {
-            fadeIn(item, 100);
-            item.classList.add('active');
-        } else {
-            fadeOut(item, 100);
-            item.classList.remove('active');
-        }
-    });
-
-    dots.forEach((dot, i) => dot.classList.toggle('active', i === index));
-
-    currentTipIndex = index;
-    remaining = tipsConfig[index].timeout * 1000;
-    startProgress();
-}
-
-function fadeIn(element, duration) {
-    element.style.display = '';
-    element.style.opacity = 0;
-    let last = +new Date();
-    const tick = function() {
-        element.style.opacity = +element.style.opacity + (new Date() - last) / duration;
-        last = +new Date();
-
-        if (+element.style.opacity < 1) {
-            requestAnimationFrame(tick);
-        } else {
-            element.style.opacity = 1;
-        }
-    };
-    tick();
-}
-
-function fadeOut(element, duration) {
-    element.style.opacity = 1;
-    let last = +new Date();
-    const tick = function() {
-        element.style.opacity = +element.style.opacity - (new Date() - last) / duration;
-        last = +new Date();
-
-        if (+element.style.opacity > 0) {
-            requestAnimationFrame(tick);
-        } else {
-            element.style.opacity = 0;
-            element.style.display = 'none';
-        }
-    };
-    tick();
-}
-
-function startProgress() {
-    const bar = document.getElementById('progressBar');
-    const tip = tipsConfig[currentTipIndex];
-    const total = remaining;
-
-    clearTimeout(progressTimeout);
-    bar.style.transition = 'none';
-    bar.style.width = `${ ((tip.timeout*1000 - remaining)/(tip.timeout*1000)) * 100 }%`;
-
-    progressStartTime = Date.now();
-
-    setTimeout(() => {
-        if (!paused) {
-            bar.style.transition = `width ${total/1000}s linear`;
-            bar.style.width = '100%';
-        }
-    }, 20);
-
-    progressTimeout = setTimeout(nextTip, total);
-}
-
-function nextTip() {
-    remaining = 0;
-    showTip((currentTipIndex + 1) % tipsConfig.length);
-}
-
-function pauseProgress() {
-    if (paused) return;
-    paused = true;
-
-    const bar = document.getElementById('progressBar');
-    const tip = tipsConfig[currentTipIndex];
-    const elapsed = Date.now() - progressStartTime;
-    remaining = Math.max(remaining - elapsed, 0);
-
-    const computedWidth = ((tip.timeout*1000 - remaining) / (tip.timeout*1000)) * 100;
-    bar.style.transition = 'none';
-    bar.style.width = `${computedWidth}%`;
-
-    clearTimeout(progressTimeout);
-}
-
-function resumeProgress() {
-    if (!paused) return;
-    paused = false;
-    startProgress();
-}
-
-load_tips(tipsConfig);
+/* --- helpful debug hint message --- */
+console.log("script.js loaded — check console/network if images don't show. Tip folder expected: assets/img/tips/");

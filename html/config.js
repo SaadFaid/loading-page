@@ -1,120 +1,88 @@
-/*=================================================================*\
-/* By: 			|	Nevera Development  							|
-/* FiveM: 		|	https://forum.cfx.re/u/neveradevelopment		|
-/* Discord: 	|	https://discord.gg/NeveraDev/tw28AqrgWU  		|
-/*=================================================================*/
-/* If you have any problems you can contact us via discord. <3     */
-
-
+// ================= STAFF TEAM =================
 var staff_team = [
-
 	{
-		"name":"Nevera Owner",
-		"image":"https://forum.cfx.re/user_avatar/forum.cfx.re/neveradevelopment/144/4447132_2.png",
+		"name":"Psiko",
+		"image":"assets/img/staff/owner.jpg", // put an image in assets/img/staff/
 		"rank":"Owner"
 	},
 	{
-		"name":"Nevera Admin",
-		"image":"https://forum.cfx.re/user_avatar/forum.cfx.re/neveradevelopment/144/4447132_2.png",
-		"rank":"Admin"
+		"name":"Win",
+		"image":"assets/img/staff/developer1.jpg",
+		"rank":"developer"
+	},
+    {
+		"name":"Ihab",
+		"image":"assets/img/staff/developer2.jpg",
+		"rank":"developer"
 	}
-
+    
 ]
 
+// ================= TIPS CONFIG =================
 const tipsConfig = [
     {
-        title: "Tip 1 (short)",
-        text: "Always wear your seatbelt when driving in Los Santos.",
-        img: "https://placehold.co/314x176/EEE/31343C",
-        timeout: 10 // seconds
+        title: "Welcome to NEW DAWN",
+        text: "A new era of GTA RP begins here. Create your story, find allies, and make your mark in Los Santos.",
+        img: "assets/img/tips/skyline.png", // GTA city skyline
+        timeout: 10
     },
     {
-        title: "Tip 2 (long)",
-        text: "Explore different jobs on the server, like taxi driving, delivery missions, or even criminal activities. Each job has its own rewards and risks. Remember to manage your time wisely, avoid unnecessary conflicts, and cooperate with other players to maximize your gains and enjoy the roleplay experience to the fullest. Take advantage of special events and seasonal activities to earn unique rewards. Always keep an eye on the map for dynamic missions and spontaneous opportunities, and make sure your character is properly equipped for any challenge that comes your way. Building relationships with other players can also unlock new roles and adventures, making every session unpredictable and exciting.",
-        img: "https://placehold.co/314x176/EEE/31343C",
-        timeout: 10 // seconds
+        title: "Jobs & Economy",
+        text: "Drive taxis, run deliveries, open businesses, or control the streets. Money opens doors, but choices define you.",
+        img: "assets/img/tips/jobs.png", // Jobs / economy image
+        timeout: 10
     },
     {
-        title: "Tip 3 (empty-image)",
-        text: "Keep backup gear: weapons, vehicles, and medical kits are essential for surviving unexpected situations.",
-        img: "",
-        timeout: 10 // seconds
+        title: "Cops vs. Criminals",
+        text: "Join the police force and protect the city — or lead a gang to dominate it. Every role matters.",
+        img: "assets/img/tips/police.png", // Police & gangs
+        timeout: 10
     },
     {
-        title: "Tip 4 (no image)",
-        text: "Read the server rules carefully and respect roleplay guidelines. Following the rules ensures a better experience for everyone.",
-        timeout: 10 // seconds
-    },
-    {
-        title: "Tip 5 (local-image)",
-        text: "Keep backup gear: weapons, vehicles, and medical kits are essential for surviving unexpected situations.",
-        img: "/tips/tip1.jpg",
-        timeout: 10 // seconds
-    },
-];
+        title: "Respect RP",
+        text: "Follow server rules, respect others, and create unforgettable RP moments together.",
+        img: "assets/img/tips/rules.png", // RP meeting / respect
+        timeout: 10
+    }
+]
 
 
 
-// Staff Settings
+// ================= DISPLAY SETTINGS =================
 const showStaffTeam = true
 const showTipList = true
 
-
-// orange
-// red
-// blue
-// green
-// pink
-// purple
+// ================= THEME =================
+// Options: orange, red, blue, green, pink, purple
 const theme = "orange"
-
-// ==== WINTER UPDATE !! ==== \\
 const enableWinterUpdate = false
-// ==== WINTER UPDATE !! ==== \\
 
-
-// Text settings
-const name = "<strong>NEV</strong>ERA"
+// ================= BRANDING =================
+const name = "<strong>NEW</strong> DAWN"
 const underName = "ROLE<b>PLAY</b>"
-const desc = "FiveM Roleplay server featuring an extensive collection of custom scripts, maps, vehicles, unique weapons, and much more."
+const desc = "Immersive FiveM roleplay server with custom jobs, cars, gangs, events and much more."
 
+// ================= SOCIAL MEDIA =================
+const discord = "https://discord.gg/psk-gang-1080156712838905916"
+const instagram = ""
+const youtube = ""
+const twitter = ""
+const tiktok = ""
+const facebook = ""
+const twitch = ""
+const github = ""
 
-// Social media
-const discord = "https://discord.gg/NeveraDev/tw28AqrgWU"  // If = "" then icon will not show up on screen
-const instagram = ""	// https://example.com
-const youtube = "" 		// https://example.com
-const twitter = "" 		// https://example.com
-const tiktok = ""  		// https://example.com
-const facebook = ""		// https://example.com
-const twitch = "" 		// https://example.com
-const github = "" 		// https://example.com
-
-
-// Video Settings
+// ================= MEDIA =================
+// Video / Audio options
 const videoBlur = 0
 var videoOpacity = 0.3
 
-
-// Example link: https://www.youtube.com/watch?v=abcdefgh
+// Example YouTube: https://www.youtube.com/watch?v=abcdefgh
 const youtubeVideo = ""
 const showYoutubeVideo = false
 
-// Local Video
+// Local video
 const enableLocalVideo = false
 
 // Local audio
-const localAudio = false
-
-
-
-// HELP //
-
-//-- YOUTBE
-//-- LOCAL AUDIO
-// if localAudio is true, then loading will load "audio.mp3" file and play it except youtube audio.
-// if localAudio is false, then loading will load youtube audio.
-
-//-- LOCAL VIDEO
-// if enableLocalVideo is true, then loading will load "video.webm" file and play it except youtube video.
-// If localVideo is enabled, showYoutubeVideo is automatically disabled.
-// You can only import a video from either YouTube or local. Local video taking priority.
+const localAudio = true // enable if you want audio.mp3 in html/ folder
